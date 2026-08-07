@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Store Ready</title>
-    <link rel="icon" type="image/png" href="./image.png">
+    <link rel="icon" type="image/png" href="./images.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
@@ -260,25 +260,37 @@
         .section-divider { margin: 30px 0 14px; }
 
         .playstore-showcase {
-            background: #ffffff;
+            background: var(--card);
             border: 1px solid var(--line);
             border-radius: 16px;
             padding: 32px;
             margin-bottom: 24px;
-            color: #202124;
+            color: var(--ink);
             font-family: 'Roboto', 'Inter', sans-serif;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        body:not(.page-light) .playstore-showcase {
-            background: #202124;
-            color: #e8eaed;
-            border-color: #3c4043;
         }
 
         .ps-header {
             display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             gap: 32px;
             margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .ps-header-left {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            flex: 1 1 420px;
+            min-width: 320px;
+        }
+        .ps-header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
         }
         .ps-icon {
             width: 180px;
@@ -307,12 +319,32 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.12);
             border: 1px solid rgba(0,0,0,0.08);
         }
-        .ps-details { display: flex; flex-direction: column; justify-content: center; }
-        .ps-title { font-size: 44px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.5px; }
-        .ps-dev { color: #01875f; font-size: 16px; font-weight: 500; margin-bottom: 4px; }
-        body:not(.page-light) .ps-dev { color: #81c995; }
-        .ps-contains { color: #5f6368; font-size: 12px; margin-bottom: 24px; }
-        body:not(.page-light) .ps-contains { color: #9aa0a6; }
+        .ps-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+        .ps-title {
+            font-size: 44px;
+            font-weight: 600;
+            margin: 0 0 4px;
+            letter-spacing: -0.5px;
+            line-height: 1.05;
+        }
+        .ps-dev {
+            color: #0f7a55;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0 0 4px;
+        }
+        body:not(.page-light) .ps-dev { color: #0f7a55; }
+        .ps-contains {
+            color: #6b7280;
+            font-size: 12px;
+            margin: 0 0 16px;
+        }
+        body:not(.page-light) .ps-contains { color: #6b7280; }
         
         .ps-stats { display: flex; gap: 40px; margin-bottom: 28px; }
         .ps-stat { display: flex; flex-direction: column; align-items: flex-start; }
@@ -320,9 +352,15 @@
         .ps-stat-lbl { font-size: 12px; color: #5f6368; }
         body:not(.page-light) .ps-stat-lbl { color: #9aa0a6; }
 
-        .ps-actions { display: flex; gap: 16px; align-items: center; }
+        .ps-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
         .ps-btn-install {
-            background: #01875f;
+            background: #0f7a55;
             color: #fff;
             border: none;
             border-radius: 8px;
@@ -331,11 +369,12 @@
             font-weight: 600;
             cursor: pointer;
             font-family: inherit;
+            box-shadow: 0 6px 12px rgba(15, 122, 85, 0.18);
         }
-        body:not(.page-light) .ps-btn-install { background: #81c995; color: #202124; }
+        body:not(.page-light) .ps-btn-install { background: #0f7a55; color: #fff; }
         .ps-btn-share {
             background: transparent;
-            color: #01875f;
+            color: #0f7a55;
             border: none;
             font-size: 14px;
             font-weight: 600;
@@ -345,7 +384,7 @@
             cursor: pointer;
             font-family: inherit;
         }
-        body:not(.page-light) .ps-btn-share { color: #81c995; }
+        body:not(.page-light) .ps-btn-share { color: #0f7a55; }
         
         .row-preview {
             display: flex;
@@ -406,7 +445,7 @@
     <div class="top">
         <div class="eyebrow-top">Utility Tool</div>
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
-            <img src="./image.png" alt="Store Ready logo" class="site-logo">
+            <img src="./images.png" alt="Store Ready logo" class="site-logo">
             <h1>Store Ready</h1>
         </div>
         <p class="sub">Every slide is a JSON spec (background, frame, spacing, and every text element with its own font/color/position). Edit visually, edit the raw JSON, describe the change in plain English for AI to edit the JSON, or pick a ready-made background preset below.</p>
@@ -421,36 +460,25 @@
    
 
     <div class="playstore-showcase">
-        <div class="ps-header" style="display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap;">
-            <div class="ps-header-left" style="display: flex; gap: 32px;">
+        <div class="ps-header">
+            <div class="ps-header-left">
                 <div class="ps-icon" id="psIcon">
-                    <img src="./image.png" alt="Store Ready logo">
+                    <img src="./images.png" alt="Store Ready logo">
                 </div>
                 <div class="ps-details">
                     <div class="ps-title" id="psTitle">Store Ready</div>
                     <div class="ps-dev">Design · Edit · Preview</div>
                     <div class="ps-contains">Hate clicking? Just ask AI.</div>
                     
-                    <div class="ps-stats">
-                        <div class="ps-stat">
-                            <div class="ps-stat-val">4.8★</div>
-                            <div class="ps-stat-lbl">12K reviews</div>
-                        </div>
-                        <div class="ps-stat">
-                            <div class="ps-stat-val">100K+</div>
-                            <div class="ps-stat-lbl">Downloads</div>
-                        </div>
-                    </div>
-
                     <div class="ps-actions">
                         <button class="ps-btn-install" id="downloadAllBtn">Download all your graphics</button>
                         <button class="ps-btn-share"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Share</button>
                     </div>
                 </div>
             </div>
-            <div class="ps-header-right" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                <div class="hero-canvas-frame" style="width: 320px; aspect-ratio: 1024/500; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--card-flat); position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center;" id="heroPosterClickArea" title="Click left/center/right phone to upload screenshots">
-                    <canvas id="heroCanvas" width="1024" height="500" style="position: absolute; top: 0; left: 0; transform-origin: top left; transform: scale(0.3125)"></canvas>
+            <div class="ps-header-right">
+                <div class="hero-canvas-frame" style="width: 480px; aspect-ratio: 1024/500; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--card-flat); position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center;" id="heroPosterClickArea" title="Click left/center/right phone to upload screenshots">
+                    <canvas id="heroCanvas" width="1024" height="500" style="position: absolute; top: 0; left: 0; transform-origin: top left; transform: scale(0.46875)"></canvas>
                 </div>
                 <div style="font-size: 11px; color: var(--ink-soft); text-align: center;">Click phones in poster to upload screenshots</div>
                 <input type="file" accept="image/*" id="hero-file-0" style="display:none;">
@@ -597,21 +625,20 @@ const DEFAULT_CONTENT = [
 function makeDefaultConfig(id) {
     const d = DEFAULT_CONTENT[id];
     const a = ACCENT_PRESETS[d.accent];
-    const dark = true;
     return {
         id,
         layoutMode: 'framed',
         canvas: { width: 1080, height: 1920 },
         background: {
-            style: 'dark',
-            colorStops: [ { offset: 0, color: '#0a1628' }, { offset: 1, color: '#050b14' } ]
+            style: 'light',
+            colorStops: [ { offset: 0, color: '#ffffff' }, { offset: 1, color: '#f7f7f8' } ]
         },
-        glow: { enabled: true, color: hexToRgba(a.accent, 0.25) },
-        frame: { x: 100, y: 400, width: 880, height: 1520, border: 14, radius: 56, tilt: 0, shellColor: '#112240', innerBg: '#0a1628' },
+        glow: { enabled: true, color: hexToRgba(a.accent, 0.15) },
+        frame: { x: 100, y: 400, width: 880, height: 1520, border: 14, radius: 56, tilt: 0, shellColor: '#1c1f26', innerBg: '#ffffff' },
         image: { zoom: 1, offsetY: 0 },
         texts: [
-            { id: 'eyebrow', content: d.eyebrow.toUpperCase(), x: 540, y: 108, fontFamily: 'Inter', fontWeight: 800, fontSize: 24, lineHeight: 30, color: a.accentSoft, highlightColor: a.accentSoft, align: 'center', letterSpacing: 4.5 },
-            { id: 'headline', content: d.headline, x: 540, y: 190, fontFamily: 'Inter', fontWeight: 900, fontSize: 76, lineHeight: 84, color: '#FFFFFF', highlightColor: a.accent, align: 'center', letterSpacing: 0 }
+            { id: 'eyebrow', content: d.eyebrow.toUpperCase(), x: 540, y: 108, fontFamily: 'Inter', fontWeight: 800, fontSize: 24, lineHeight: 30, color: '#111827', highlightColor: a.accent, align: 'center', letterSpacing: 4.5 },
+            { id: 'headline', content: d.headline, x: 540, y: 190, fontFamily: 'Inter', fontWeight: 900, fontSize: 76, lineHeight: 84, color: '#14181f', highlightColor: a.accent, align: 'center', letterSpacing: 0 }
         ]
     };
 }
@@ -726,6 +753,14 @@ function drawFrame(ctx, frame, img, H) {
     roundRectPath(ctx, frame.x, frame.y, frame.width, frame.height, { tl: frame.radius, tr: frame.radius, br: 0, bl: 0 });
     ctx.fill();
 
+    const notchRadius = 18;
+    const notchX = frame.x + frame.width / 2;
+    const notchY = frame.y + 16;
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.32)';
+    ctx.arc(notchX, notchY, notchRadius, 0, Math.PI * 2);
+    ctx.fill();
+
     const innerX = frame.x + frame.border;
     const innerY = frame.y + frame.border;
     const innerW = frame.width - frame.border * 2;
@@ -746,15 +781,15 @@ function drawFrame(ctx, frame, img, H) {
         const dy = innerY + (frame.imageOffsetY || 0);
         ctx.drawImage(img, dx, dy, drawW, drawH);
     } else {
-        ctx.fillStyle = '#050b14';
+        ctx.fillStyle = '#ffffff';
         ctx.fillRect(innerX, innerY, innerW, innerH);
-        ctx.strokeStyle = '#1e3a5f';
-        ctx.lineWidth = 4;
-        ctx.setLineDash([16, 12]);
-        ctx.strokeRect(innerX + 8, innerY + 8, innerW - 16, innerH - 16);
+        ctx.strokeStyle = '#d1d5db';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([14, 10]);
+        ctx.strokeRect(innerX + 10, innerY + 10, innerW - 20, innerH - 20);
         ctx.setLineDash([]);
-        ctx.fillStyle = '#64748b';
-        ctx.font = '700 26px Inter, sans-serif';
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '700 72px Inter, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('Upload screenshot', innerX + innerW / 2, innerY + innerH / 2);
     }
@@ -763,7 +798,6 @@ function drawFrame(ctx, frame, img, H) {
         const tbH = 64;
         ctx.fillStyle = frame.titleBar.bg || frame.shellColor;
         ctx.fillRect(innerX, innerY, innerW, tbH);
-        
         if (frame.titleBar.text) {
             ctx.fillStyle = frame.titleBar.color || '#ffffff';
             ctx.font = '600 22px Inter, sans-serif';
@@ -796,7 +830,7 @@ function drawFullBleedPlaceholder(ctx, W, H) {
     ctx.strokeRect(24, 24, W - 48, H - 48);
     ctx.setLineDash([]);
     ctx.fillStyle = '#64748b';
-    ctx.font = '700 30px Inter, sans-serif';
+    ctx.font = '700 72px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('Upload screenshot', W / 2, H / 2);
 }
