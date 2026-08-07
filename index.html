@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Store Ready</title>
+    <link rel="icon" type="image/png" href="./image.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
@@ -38,6 +39,7 @@
             font-family: 'Inter', sans-serif;
             padding: 28px 20px 80px;
             transition: background .15s, color .15s;
+        }
         .page { max-width: 1180px; margin: 0 auto; }
 
         .top { margin-bottom: 20px; }
@@ -282,14 +284,28 @@
             width: 180px;
             height: 180px;
             border-radius: 36px;
-            background: var(--orange);
+            background: #fff;
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 64px;
-            font-weight: 800;
+            overflow: hidden;
             box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+        .ps-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .site-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            border: 1px solid rgba(0,0,0,0.08);
         }
         .ps-details { display: flex; flex-direction: column; justify-content: center; }
         .ps-title { font-size: 44px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.5px; }
@@ -389,7 +405,10 @@
 
     <div class="top">
         <div class="eyebrow-top">Utility Tool</div>
-        <h1>Store Ready</h1>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+            <img src="./image.png" alt="Store Ready logo" class="site-logo">
+            <h1>Store Ready</h1>
+        </div>
         <p class="sub">Every slide is a JSON spec (background, frame, spacing, and every text element with its own font/color/position). Edit visually, edit the raw JSON, describe the change in plain English for AI to edit the JSON, or pick a ready-made background preset below.</p>
         <div style="display: flex; gap: 16px; align-items: flex-end; margin-top:12px;">
             <div class="field" style="width: 320px;">
@@ -404,7 +423,9 @@
     <div class="playstore-showcase">
         <div class="ps-header" style="display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap;">
             <div class="ps-header-left" style="display: flex; gap: 32px;">
-                <div class="ps-icon" id="psIcon">SR</div>
+                <div class="ps-icon" id="psIcon">
+                    <img src="./image.png" alt="Store Ready logo">
+                </div>
                 <div class="ps-details">
                     <div class="ps-title" id="psTitle">Store Ready</div>
                     <div class="ps-dev">Design · Edit · Preview</div>
@@ -1311,15 +1332,6 @@ setTimeout(() => { renderAllCards(); wireHero(); }, 800);
 document.getElementById('projectNameInput').addEventListener('input', (e) => {
     const val = e.target.value.trim() || 'Store Ready';
     document.getElementById('psTitle').textContent = val;
-    
-    const words = val.split(' ').filter(w => w.length > 0);
-    let iconText = '';
-    if (words.length > 1) {
-        iconText = words[0][0] + words[1][0];
-    } else {
-        iconText = val.substring(0, 2);
-    }
-    document.getElementById('psIcon').textContent = iconText.toUpperCase();
 });
 
 document.getElementById('schemaHelpBlock').textContent = SCHEMA_DOC;
