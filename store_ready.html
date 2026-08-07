@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Ready</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050b14;
+            --card: #0a1628;
+            --card-flat: #112240;
+            --ink: #f8fafc;
+            --ink-soft: #94a3b8;
+            --ink-faint: #64748b;
+            --orange: #ff6b00;
+        }
+        body {
+            --bg: #f4f5f8;
+            --card: #ffffff;
+            --card-flat: #f0f2f6;
+            --ink: #14181f;
+            --ink-soft: #4b5563;
+            --ink-faint: #8a92a3;
+            --line: #dde2ea;
+            --orange: #ff6b00;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Inter', sans-serif;
+            padding: 28px 20px 80px;
+            transition: background .15s, color .15s;
+        .page { max-width: 1180px; margin: 0 auto; }
+
+        .top { margin-bottom: 20px; }
+
+        .eyebrow-top {
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--orange);
+            margin-bottom: 8px;
+        }
+
+        h1 { font-size: 26px; font-weight: 800; margin: 0 0 6px; letter-spacing: -0.01em; }
+        h2.section-title { font-size: 18px; font-weight: 800; margin: 2px 0 6px; }
+        .sub { color: var(--ink-soft); font-size: 13.5px; max-width: 640px; line-height: 1.5; }
+
+        .global-actions { display: flex; gap: 10px; margin: 16px 0 6px; flex-wrap: wrap; }
+
+        .btn, .btn-small {
+            border: none;
+            border-radius: 999px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn { padding: 11px 20px; font-size: 13px; }
+        .btn-small { padding: 8px 15px; font-size: 12px; }
+
+        .btn-primary { background: var(--orange); color: #fff; }
+        .btn-ghost { background: var(--card); color: var(--ink); border: 1px solid var(--line); }
+        .btn-ai { background: linear-gradient(135deg,#8B7FE0,#6B8FE8); color: #fff; }
+        .btn-download { background: var(--ink); color: #050b14; }
+        .btn-reset { background: var(--card-flat); color: var(--ink-soft); }
+        .btn-outline { background: transparent; color: var(--ink-soft); border: 1px solid var(--line); }
+        .btn[disabled], .btn-small[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+        input[type=file] { display: none; }
+
+        /* ---- settings drawer ---- */
+        details.settings {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin: 18px 0;
+        }
+        details.settings summary {
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13.5px;
+            list-style: none;
+        }
+        details.settings summary::-webkit-details-marker { display: none; }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 14px;
+        }
+        @media (max-width:760px) { .settings-grid { grid-template-columns: 1fr; } }
+        .settings-note { font-size: 12px; color: var(--ink-faint); margin-top: 10px; line-height: 1.5; }
+
+        /* ---- global restyle bar ---- */
+        .global-ai-bar {
+            background: linear-gradient(135deg, rgba(139,127,224,0.12), rgba(107,143,232,0.08));
+            border: 1px solid #3d3a6b;
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin: 14px 0 26px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .global-ai-bar .row { display: flex; gap: 10px; }
+        .global-ai-bar textarea {
+            flex: 1;
+            min-height: 44px;
+            resize: vertical;
+        }
+        .ai-status { font-size: 12px; font-weight: 600; min-height: 16px; }
+        .ai-status.ok { color: var(--green); }
+        .ai-status.err { color: var(--red); }
+        .ai-status.pending { color: var(--ink-soft); }
+
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ink-soft);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 5px;
+        }
+        .field input[type=text],
+        .field input[type=number],
+        .field input[type=password],
+        .field textarea,
+        .field select {
+            width: 100%;
+            background: var(--card-flat);
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            padding: 8px 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: var(--ink);
+            outline: none;
+        }
+        .field textarea { resize: vertical; min-height: 50px; font-family: inherit; }
+        .field input:focus, .field textarea:focus, .field select:focus {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(255,107,0,0.15);
+        }
+
+        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+
+        .slide-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 22px;
+            display: grid;
+            grid-template-columns: 230px 1fr;
+            gap: 26px;
+            border: 1px solid var(--line);
+        }
+        @media (max-width:800px) { .slide-card { grid-template-columns: 1fr; } }
+
+        .preview-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .canvas-frame {
+            width: 210px; height: 373px;
+            border-radius: 14px; overflow: hidden;
+            border: 1px solid var(--line);
+            background: var(--card-flat);
+            position: relative;
+        }
+        .canvas-frame canvas {
+            position: absolute; top: 0; left: 0;
+            width: 1080px; height: 1920px;
+            transform: scale(0.1944);
+            transform-origin: top left;
+        }
+        .slide-num { font-size: 11px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.08em; }
+
+        .controls-col { display: flex; flex-direction: column; gap: 12px; }
+
+        .tabs { display: flex; gap: 4px; background: var(--card-flat); border-radius: 10px; padding: 3px; }
+        .tab-btn {
+            flex: 1; border: none; background: transparent; color: var(--ink-soft);
+            font-size: 12px; font-weight: 700; padding: 7px 8px; border-radius: 7px; cursor: pointer;
+        }
+        .tab-btn.active { background: var(--orange); color: #fff; }
+        .tab-panel { display: none; flex-direction: column; gap: 10px; }
+        .tab-panel.active { display: flex; }
+
+        .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+        .upload-zone {
+            border: 2px dashed var(--line);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            background: var(--card-flat);
+            font-size: 12.5px;
+            color: var(--ink-soft);
+            font-weight: 600;
+        }
+        .upload-zone:hover { border-color: var(--orange); }
+        .upload-zone.has-image { color: var(--green); border-color: var(--green); }
+
+        .accent-swatches { display: flex; gap: 8px; }
+        .swatch { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+        .swatch.active { border-color: var(--ink); }
+
+        .text-item-box {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px;
+            background: var(--card-flat);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .text-item-box .th { font-size: 11px; font-weight: 800; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.06em; }
+
+        .json-editor {
+            width: 100%;
+            min-height: 260px;
+            font-family: var(--mono);
+            font-size: 11.5px;
+            line-height: 1.5;
+            background: #050b14;
+            color: #b9e6c9;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px;
+            resize: vertical;
+            outline: none;
+        }
+        .json-editor:focus { border-color: var(--orange); }
+        .json-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .ai-panel {
+            border: 1px solid #3d3a6b;
+            background: rgba(139,127,224,0.08);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .card-actions { display: flex; gap: 8px; margin-top: 2px; flex-wrap: wrap; }
+
+        footer { text-align: center; margin-top: 40px; font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+        .section-divider { margin: 30px 0 14px; }
+
+        .playstore-showcase {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            color: #202124;
+            font-family: 'Roboto', 'Inter', sans-serif;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        body:not(.page-light) .playstore-showcase {
+            background: #202124;
+            color: #e8eaed;
+            border-color: #3c4043;
+        }
+
+        .ps-header {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+        .ps-icon {
+            width: 180px;
+            height: 180px;
+            border-radius: 36px;
+            background: var(--orange);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            font-weight: 800;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+        }
+        .ps-details { display: flex; flex-direction: column; justify-content: center; }
+        .ps-title { font-size: 44px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .ps-dev { color: #01875f; font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+        body:not(.page-light) .ps-dev { color: #81c995; }
+        .ps-contains { color: #5f6368; font-size: 12px; margin-bottom: 24px; }
+        body:not(.page-light) .ps-contains { color: #9aa0a6; }
+        
+        .ps-stats { display: flex; gap: 40px; margin-bottom: 28px; }
+        .ps-stat { display: flex; flex-direction: column; align-items: flex-start; }
+        .ps-stat-val { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+        .ps-stat-lbl { font-size: 12px; color: #5f6368; }
+        body:not(.page-light) .ps-stat-lbl { color: #9aa0a6; }
+
+        .ps-actions { display: flex; gap: 16px; align-items: center; }
+        .ps-btn-install {
+            background: #01875f;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        body:not(.page-light) .ps-btn-install { background: #81c995; color: #202124; }
+        .ps-btn-share {
+            background: transparent;
+            color: #01875f;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        body:not(.page-light) .ps-btn-share { color: #81c995; }
+        
+        .row-preview {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .row-preview::-webkit-scrollbar {
+            display: none;
+        }
+        .row-thumb {
+            flex: 0 0 auto;
+            width: 250px;
+            aspect-ratio: 1080/1920;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: var(--card-flat);
+            object-fit: cover;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
+        }
+        .row-thumb:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        
+        .split-pane {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 900px) {
+            .split-pane { grid-template-columns: 1fr; }
+        }
+        
+        .code-box {
+            font-family: var(--mono);
+            font-size: 12px;
+            background: #f8f9fa;
+            border: 1px solid var(--line);
+            padding: 14px;
+            border-radius: 8px;
+            color: #1a73e8;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+<div class="page">
+
+    <div class="top">
+        <div class="eyebrow-top">Utility Tool</div>
+        <h1>Store Ready</h1>
+        <p class="sub">Every slide is a JSON spec (background, frame, spacing, and every text element with its own font/color/position). Edit visually, edit the raw JSON, describe the change in plain English for AI to edit the JSON, or pick a ready-made background preset below.</p>
+        <div style="display: flex; gap: 16px; align-items: flex-end; margin-top:12px;">
+            <div class="field" style="width: 320px;">
+                <label>Project / app name (used for file names)</label>
+                <input type="text" id="projectNameInput" value="Store Ready">
+            </div>
+        </div>
+    </div>
+
+   
+
+    <div class="playstore-showcase">
+        <div class="ps-header" style="display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap;">
+            <div class="ps-header-left" style="display: flex; gap: 32px;">
+                <div class="ps-icon" id="psIcon">SR</div>
+                <div class="ps-details">
+                    <div class="ps-title" id="psTitle">Store Ready</div>
+                    <div class="ps-dev">Design · Edit · Preview</div>
+                    <div class="ps-contains">Hate clicking? Just ask AI.</div>
+                    
+                    <div class="ps-stats">
+                        <div class="ps-stat">
+                            <div class="ps-stat-val">4.8★</div>
+                            <div class="ps-stat-lbl">12K reviews</div>
+                        </div>
+                        <div class="ps-stat">
+                            <div class="ps-stat-val">100K+</div>
+                            <div class="ps-stat-lbl">Downloads</div>
+                        </div>
+                    </div>
+
+                    <div class="ps-actions">
+                        <button class="ps-btn-install" id="downloadAllBtn">Download all your graphics</button>
+                        <button class="ps-btn-share"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Share</button>
+                    </div>
+                </div>
+            </div>
+            <div class="ps-header-right" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                <div class="hero-canvas-frame" style="width: 320px; aspect-ratio: 1024/500; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--card-flat); position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center;" id="heroPosterClickArea" title="Click left/center/right phone to upload screenshots">
+                    <canvas id="heroCanvas" width="1024" height="500" style="position: absolute; top: 0; left: 0; transform-origin: top left; transform: scale(0.3125)"></canvas>
+                </div>
+                <div style="font-size: 11px; color: var(--ink-soft); text-align: center;">Click phones in poster to upload screenshots</div>
+                <input type="file" accept="image/*" id="hero-file-0" style="display:none;">
+                <input type="file" accept="image/*" id="hero-file-1" style="display:none;">
+                <input type="file" accept="image/*" id="hero-file-2" style="display:none;">
+            </div>
+        </div>
+        
+        <div class="row-preview" id="rowPreview"></div>
+    </div>
+    
+    <div class="split-pane">
+        <div class="split-left">
+            <h2 class="section-title">AI Restyle</h2>
+            <p class="sub" style="margin-bottom: 20px;">Describe the change you want across all slides (e.g. "switch everything to light theme with the brown accent" or "make all headlines 10% bigger").</p>
+            <div class="global-ai-bar" style="max-width: 100%; margin-top: 0;">
+                <div class="row" style="flex-direction: column;">
+                    <textarea id="globalAiPrompt" placeholder="Prompt AI: Update the JSON config below. Make the background a clean white. Change the text color to #14181f and the highlight color to #ff6b00. Set the phone frame tilt to -3." style="min-height: 120px; font-size: 14px; width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 12px;"></textarea>
+                    <button class="btn btn-ai" id="copyPromptBtn" style="align-self:flex-start; margin-top: 12px;">📋 Copy Prompt (with Config)</button>
+                </div>
+                <div class="ai-status" id="globalAiStatus"></div>
+            </div>
+        </div>
+        <div class="split-right">
+            <h2 class="section-title">Slide Configuration</h2>
+            <p class="sub" style="margin-bottom: 12px;">Edit the active slide below, or paste an array of all 8 slides.</p>
+            <details class="settings" style="margin: 0 0 14px 0; padding: 10px 14px;">
+                <summary style="color: var(--orange); font-size: 12px;">View Configuration Rules & Allowed Values</summary>
+                <div class="settings-note" style="margin-top: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; white-space: pre-wrap; color: var(--ink-soft);" id="schemaHelpBlock"></div>
+            </details>
+            <textarea id="globalConfigJson" class="json-editor"></textarea>
+            <div class="json-actions" style="margin-top: 10px;">
+                <button class="btn btn-primary" id="applyGlobalConfigBtn">Apply Config</button>
+            </div>
+            <div class="ai-status" id="globalConfigStatus"></div>
+        </div>
+    </div>
+    
+    <div id="hiddenCanvases" style="display:none;"></div>
+    <input type="file" accept="image/*" id="hiddenFileInput" style="display:none;">
+
+    <footer>Store Ready · JSON Engine</footer>
+</div>
+
+<script>
+/* =========================================================================
+   SCHEMA
+   Each slide is fully described by this JSON shape. Nothing about layout
+   or style is hardcoded in the renderer — it just paints whatever is here.
+
+   {
+     id: number,
+     canvas: { width, height },
+     background: { style: 'dark'|'light', colorStops: [{offset, color}, ...] },
+     glow: { enabled: bool, color: 'rgba(...)' },
+     frame: { x, y, width, height, border, radius, tilt, shellColor, innerBg },
+     image: { zoom, offsetY },
+     texts: [
+       {
+         id, content,            // content: use \n for line breaks, *word* to highlight
+         x, y,                   // anchor position
+         fontFamily, fontWeight, fontSize, lineHeight,
+         color, highlightColor,  // highlightColor used for *asterisk* segments
+         align,                  // 'left' | 'center'
+         letterSpacing           // 0 = normal text, >0 = tracked/spaced caps style
+       }, ...
+     ]
+   }
+   ========================================================================= */
+
+const SCHEMA_DOC = `GLOBAL JSON SCHEMA (return ONLY a JSON object matching this exact shape, no markdown fences, no commentary):
+{
+  "hero": {
+    "headline": "string with \\n for breaks and *word* to highlight",
+    "sub": "string"
+  },
+  "slides": [
+    {
+      "id": number,
+      "layoutMode": "framed" | "framed_plain" | "full_bleed" | "full_bleed_titled",
+      "canvas": { "width": 1080, "height": 1920 },
+      "background": { "style": "dark" | "light", "colorStops": [ { "offset": 0, "color": "#hex" }, { "offset": 1, "color": "#hex" } ] },
+      "glow": { "enabled": boolean, "color": "rgba(r,g,b,a)" },
+      "frame": { "x": number, "y": number, "width": number, "height": number, "border": number, "radius": number, "tilt": number, "shellColor": "#hex", "innerBg": "#hex", "titleBar": { "enabled": boolean, "text": "string", "bg": "#hex", "color": "#hex" } },
+      "image": { "zoom": number (0.8-1.6), "offsetY": number },
+      "texts": [
+    { "id": "eyebrow", "content": "string", "x": number, "y": number, "fontFamily": "Inter", "fontWeight": 800, "fontSize": number, "lineHeight": number, "color": "#hex", "highlightColor": "#hex", "align": "left"|"center", "letterSpacing": number },
+    { "id": "headline", "content": "string with \\n for breaks and *word* to highlight", "x": number, "y": number, "fontFamily": "Inter", "fontWeight": 900, "fontSize": number, "lineHeight": number, "color": "#hex", "highlightColor": "#hex", "align": "left"|"center", "letterSpacing": 0 }
+  ]
+}
+Canvas is always 1080x1920 portrait. "x" for center-aligned text is normally 540 (canvas center). Frame is the phone mockup: x/y/width/height controls its size and the empty space around it. Keep frame.tilt between -8 and 8 to avoid the phone clipping off the canvas edges. "framed" shows the phone mockup with eyebrow+headline text; "framed_plain" shows the phone mockup with no text; "full_bleed" fills the entire canvas with the raw screenshot, no frame, no text; "full_bleed_titled" fills the canvas with the raw screenshot plus a dark gradient caption bar at the bottom showing the headline text only. Named background presets available for inspiration (you can also invent your own colors): midnight navy, charcoal, deep purple, forest (all dark); clean light, soft peach, mint fresh, sky (all light). Keep all fields present in the output even if unchanged.`;
+
+const ACCENT_PRESETS = {
+    orange:       { accent: '#ff6b00', accentSoft: '#ffe5d2' },
+    navy:         { accent: '#0a1628', accentSoft: '#d9e0ea' },
+    brown:        { accent: '#572000', accentSoft: '#ecd7cd' },
+    light_orange: { accent: '#ff8933', accentSoft: '#ffeadc' },
+};
+const ACCENT_ORDER = ['orange', 'navy', 'brown', 'light_orange'];
+
+/* Ready-made full backgrounds for the screenshot frame — one click sets
+   background gradient, glow, phone shell/inner colors, and text colors
+   together so everything stays legible. AI-generated configs can also
+   just set these fields explicitly without picking a named preset. */
+const FRAME_BG_PRESETS = [
+    { id: 'midnight',   name: 'Midnight Navy', style: 'dark',  stops: ['#0a1628', '#050b14'], glow: 'rgba(255,107,0,0.25)', shellColor: '#112240', innerBg: '#0a1628', headlineColor: '#FFFFFF', eyebrowColor: '#ffe5d2', highlightColor: '#ff6b00' },
+    { id: 'charcoal',   name: 'Charcoal',      style: 'dark',  stops: ['#1a1a1a', '#0d0d0d'], glow: 'rgba(107,143,232,0.22)', shellColor: '#252525', innerBg: '#161616', headlineColor: '#FFFFFF', eyebrowColor: '#cfd6e6', highlightColor: '#6B8FE8' },
+    { id: 'deep_purple',name: 'Deep Purple',   style: 'dark',  stops: ['#1e1b4b', '#0f0c29'], glow: 'rgba(139,127,224,0.28)', shellColor: '#2c2760', innerBg: '#181433', headlineColor: '#FFFFFF', eyebrowColor: '#e9e5fb', highlightColor: '#8B7FE0' },
+    { id: 'forest',     name: 'Forest',        style: 'dark',  stops: ['#0f2818', '#04140b'], glow: 'rgba(76,175,125,0.25)', shellColor: '#173a24', innerBg: '#0a1f13', headlineColor: '#FFFFFF', eyebrowColor: '#dbf0e4', highlightColor: '#4CAF7D' },
+    { id: 'clean_light',name: 'Clean Light',   style: 'light', stops: ['#ffffff', '#f4f5f8'], glow: null, shellColor: '#1C1F26', innerBg: '#FFFFFF', headlineColor: '#1C1F26', eyebrowColor: '#ff6b00', highlightColor: '#ff6b00' },
+    { id: 'soft_peach', name: 'Soft Peach',    style: 'light', stops: ['#ffe5d2', '#fff8f3'], glow: null, shellColor: '#1C1F26', innerBg: '#FFFFFF', headlineColor: '#1C1F26', eyebrowColor: '#c2500a', highlightColor: '#ff6b00' },
+    { id: 'mint_fresh', name: 'Mint Fresh',    style: 'light', stops: ['#dbf0e4', '#f4faf6'], glow: null, shellColor: '#1C1F26', innerBg: '#FFFFFF', headlineColor: '#1C1F26', eyebrowColor: '#2f7f5a', highlightColor: '#4CAF7D' },
+    { id: 'sky',        name: 'Sky',           style: 'light', stops: ['#e1e8fc', '#f5f8ff'], glow: null, shellColor: '#1C1F26', innerBg: '#FFFFFF', headlineColor: '#1C1F26', eyebrowColor: '#3f5fb0', highlightColor: '#6B8FE8' },
+];
+
+function applyFrameBgPreset(cfg, presetId) {
+    const p = FRAME_BG_PRESETS.find(x => x.id === presetId);
+    if (!p) return;
+    cfg.background.style = p.style;
+    cfg.background.colorStops = [ { offset: 0, color: p.stops[0] }, { offset: 1, color: p.stops[1] } ];
+    cfg.glow.enabled = !!p.glow;
+    if (p.glow) cfg.glow.color = p.glow;
+    cfg.frame.shellColor = p.shellColor;
+    cfg.frame.innerBg = p.innerBg;
+    const eyebrow = getText(cfg, 'eyebrow');
+    const headline = getText(cfg, 'headline');
+    eyebrow.color = p.eyebrowColor;
+    eyebrow.highlightColor = p.eyebrowColor;
+    headline.color = p.headlineColor;
+    headline.highlightColor = p.highlightColor;
+}
+
+const DEFAULT_CONTENT = [
+    { eyebrow: 'YOUR APP', headline: 'Get things done\nin *seconds*.', accent: 'orange' },
+    { eyebrow: 'SMART TRACKING', headline: 'Log everything\nwith *one tap*.', accent: 'navy' },
+    { eyebrow: 'AUTOMATED', headline: 'Accurate results,\n*every time*.', accent: 'brown' },
+    { eyebrow: 'DOCUMENTS', headline: '*Print-ready* output,\ninstantly.', accent: 'light_orange' },
+    { eyebrow: 'ALWAYS ON', headline: 'Works even with\n*zero signal*.', accent: 'orange' },
+    { eyebrow: 'BACKUP', headline: 'Cross-device sync.\n*Never* lose data.', accent: 'navy' },
+    { eyebrow: 'PRIVACY', headline: 'Your data,\n*strictly secure*.', accent: 'brown' },
+    { eyebrow: 'YOUR APP', headline: 'Built for people\n*who get it*.', accent: 'light_orange' },
+];
+
+function makeDefaultConfig(id) {
+    const d = DEFAULT_CONTENT[id];
+    const a = ACCENT_PRESETS[d.accent];
+    const dark = true;
+    return {
+        id,
+        layoutMode: 'framed',
+        canvas: { width: 1080, height: 1920 },
+        background: {
+            style: 'dark',
+            colorStops: [ { offset: 0, color: '#0a1628' }, { offset: 1, color: '#050b14' } ]
+        },
+        glow: { enabled: true, color: hexToRgba(a.accent, 0.25) },
+        frame: { x: 100, y: 400, width: 880, height: 1520, border: 14, radius: 56, tilt: 0, shellColor: '#112240', innerBg: '#0a1628' },
+        image: { zoom: 1, offsetY: 0 },
+        texts: [
+            { id: 'eyebrow', content: d.eyebrow.toUpperCase(), x: 540, y: 108, fontFamily: 'Inter', fontWeight: 800, fontSize: 24, lineHeight: 30, color: a.accentSoft, highlightColor: a.accentSoft, align: 'center', letterSpacing: 4.5 },
+            { id: 'headline', content: d.headline, x: 540, y: 190, fontFamily: 'Inter', fontWeight: 900, fontSize: 76, lineHeight: 84, color: '#FFFFFF', highlightColor: a.accent, align: 'center', letterSpacing: 0 }
+        ]
+    };
+}
+
+function hexToRgba(hex, alpha) {
+    const h = hex.replace('#', '');
+    const r = parseInt(h.substring(0,2), 16), g = parseInt(h.substring(2,4), 16), b = parseInt(h.substring(4,6), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
+
+let slides = Array.from({ length: 8 }, (_, i) => ({
+    id: i,
+    config: makeDefaultConfig(i),
+    img: null,
+}));
+
+let aiSettings = { apiKey: '', model: 'deepseek/deepseek-chat', endpoint: 'https://openrouter.ai/api/v1/chat/completions' };
+
+/* =========================================================================
+   GENERIC RENDER ENGINE — reads ONLY from cfg, nothing slide-specific here
+   ========================================================================= */
+
+function roundRectPath(ctx, x, y, w, h, r) {
+    const rr = { tl: r, tr: r, br: r, bl: r };
+    if (typeof r === 'object') Object.assign(rr, r);
+    ctx.beginPath();
+    ctx.moveTo(x + rr.tl, y);
+    ctx.lineTo(x + w - rr.tr, y);
+    ctx.arcTo(x + w, y, x + w, y + rr.tr, rr.tr);
+    ctx.lineTo(x + w, y + h - rr.br);
+    ctx.arcTo(x + w, y + h, x + w - rr.br, y + h, rr.br);
+    ctx.lineTo(x + rr.bl, y + h);
+    ctx.arcTo(x, y + h, x, y + h - rr.bl, rr.bl);
+    ctx.lineTo(x, y + rr.tl);
+    ctx.arcTo(x, y, x + rr.tl, y, rr.tl);
+    ctx.closePath();
+}
+
+function drawBackground(ctx, W, H, bg) {
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    (bg.colorStops || []).forEach(s => grad.addColorStop(s.offset, s.color));
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+}
+
+function drawGlow(ctx, W, H, glow) {
+    if (!glow || !glow.enabled) return;
+    const g = ctx.createRadialGradient(W / 2, H - 400, 100, W / 2, H - 400, 700);
+    g.addColorStop(0, glow.color);
+    g.addColorStop(1, 'rgba(10,22,40,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+}
+
+function drawSpacedText(ctx, text, x, y, spacing, align) {
+    const widths = [...text].map(ch => ctx.measureText(ch).width);
+    const totalWidth = widths.reduce((a, b) => a + b, 0) + spacing * (text.length - 1);
+    let startX = align === 'left' ? x : x - totalWidth / 2;
+    for (let i = 0; i < text.length; i++) {
+        ctx.fillText(text[i], startX, y);
+        startX += widths[i] + spacing;
+    }
+}
+
+function drawHighlightLine(ctx, rawLine, x, y, align, baseColor, highlightColor) {
+    const parts = rawLine.split('*');
+    const widths = parts.map(p => ctx.measureText(p).width);
+    const totalWidth = widths.reduce((a, b) => a + b, 0);
+    let cursorX = align === 'left' ? x : x - totalWidth / 2;
+    const prevAlign = ctx.textAlign;
+    ctx.textAlign = 'left';
+    parts.forEach((part, i) => {
+        ctx.fillStyle = (i % 2 === 1) ? highlightColor : baseColor;
+        ctx.fillText(part, cursorX, y);
+        cursorX += widths[i];
+    });
+    ctx.textAlign = prevAlign;
+}
+
+function drawTextItem(ctx, t) {
+    const font = `${t.fontWeight || 400} ${t.fontSize}px ${t.fontFamily || 'Inter'}, sans-serif`;
+    ctx.font = font;
+    ctx.textAlign = t.align || 'center';
+    ctx.textBaseline = 'alphabetic';
+    const lines = String(t.content || '').split('\n');
+    const lh = t.lineHeight || t.fontSize * 1.15;
+    lines.forEach((line, i) => {
+        const y = t.y + i * lh;
+        if (t.letterSpacing) {
+            ctx.fillStyle = t.color;
+            drawSpacedText(ctx, line, t.x, y, t.letterSpacing, t.align || 'center');
+        } else if (line.includes('*')) {
+            drawHighlightLine(ctx, line, t.x, y, t.align || 'center', t.color, t.highlightColor || t.color);
+        } else {
+            ctx.fillStyle = t.color;
+            ctx.fillText(line, t.x, y);
+        }
+    });
+}
+
+function drawFrame(ctx, frame, img, H) {
+    ctx.save();
+    const cx = frame.x + frame.width / 2;
+    const cy = H;
+    ctx.translate(cx, cy);
+    ctx.rotate((frame.tilt || 0) * Math.PI / 180);
+    ctx.translate(-cx, -cy);
+
+    ctx.fillStyle = frame.shellColor;
+    roundRectPath(ctx, frame.x, frame.y, frame.width, frame.height, { tl: frame.radius, tr: frame.radius, br: 0, bl: 0 });
+    ctx.fill();
+
+    const innerX = frame.x + frame.border;
+    const innerY = frame.y + frame.border;
+    const innerW = frame.width - frame.border * 2;
+    const innerH = frame.height - frame.border;
+
+    ctx.save();
+    roundRectPath(ctx, innerX, innerY, innerW, innerH, { tl: Math.max(0, frame.radius - frame.border), tr: Math.max(0, frame.radius - frame.border), br: 0, bl: 0 });
+    ctx.clip();
+    ctx.fillStyle = frame.innerBg;
+    ctx.fillRect(innerX, innerY, innerW, innerH);
+
+    if (img) {
+        const baseScale = innerW / img.width;
+        const scale = baseScale * (frame.imageZoom || 1);
+        const drawW = img.width * scale;
+        const drawH = img.height * scale;
+        const dx = innerX + (innerW - drawW) / 2;
+        const dy = innerY + (frame.imageOffsetY || 0);
+        ctx.drawImage(img, dx, dy, drawW, drawH);
+    } else {
+        ctx.fillStyle = '#050b14';
+        ctx.fillRect(innerX, innerY, innerW, innerH);
+        ctx.strokeStyle = '#1e3a5f';
+        ctx.lineWidth = 4;
+        ctx.setLineDash([16, 12]);
+        ctx.strokeRect(innerX + 8, innerY + 8, innerW - 16, innerH - 16);
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#64748b';
+        ctx.font = '700 26px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Upload screenshot', innerX + innerW / 2, innerY + innerH / 2);
+    }
+
+    if (frame.titleBar && frame.titleBar.enabled) {
+        const tbH = 64;
+        ctx.fillStyle = frame.titleBar.bg || frame.shellColor;
+        ctx.fillRect(innerX, innerY, innerW, tbH);
+        
+        if (frame.titleBar.text) {
+            ctx.fillStyle = frame.titleBar.color || '#ffffff';
+            ctx.font = '600 22px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(frame.titleBar.text, innerX + innerW / 2, innerY + tbH / 2);
+        }
+    }
+
+    ctx.restore();
+    ctx.restore();
+}
+
+function drawCoverImage(ctx, img, x, y, w, h) {
+    const scale = Math.max(w / img.width, h / img.height);
+    const drawW = img.width * scale, drawH = img.height * scale;
+    const dx = x + (w - drawW) / 2, dy = y + (h - drawH) / 2;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+    ctx.drawImage(img, dx, dy, drawW, drawH);
+    ctx.restore();
+}
+
+function drawFullBleedPlaceholder(ctx, W, H) {
+    ctx.fillStyle = '#0a1628';
+    ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = '#1e3a5f';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([16, 12]);
+    ctx.strokeRect(24, 24, W - 48, H - 48);
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '700 30px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Upload screenshot', W / 2, H / 2);
+}
+
+function drawSlide(slide) {
+    const cfg = slide.config;
+    const canvas = document.getElementById(`canvas-${slide.id}`);
+    const ctx = canvas.getContext('2d');
+    const W = cfg.canvas.width, H = cfg.canvas.height;
+    canvas.width = W; canvas.height = H;
+    const mode = cfg.layoutMode || 'framed';
+
+    if (mode === 'full_bleed' || mode === 'full_bleed_titled') {
+        // Raw, edge-to-edge screenshot — matches how Play Store often shows
+        // at least one un-framed shot in a set.
+        if (slide.img) drawCoverImage(ctx, slide.img, 0, 0, W, H);
+        else drawFullBleedPlaceholder(ctx, W, H);
+
+        if (mode === 'full_bleed_titled') {
+            const headline = getText(cfg, 'headline');
+            const capH = 260;
+            const grad = ctx.createLinearGradient(0, H - capH, 0, H);
+            grad.addColorStop(0, 'rgba(5,11,20,0)');
+            grad.addColorStop(1, 'rgba(5,11,20,0.88)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, H - capH, W, capH);
+            drawTextItem(ctx, Object.assign({}, headline, { y: H - 90, fontSize: Math.min(headline.fontSize, 56), lineHeight: 60 }));
+        }
+    } else {
+        drawBackground(ctx, W, H, cfg.background);
+        drawGlow(ctx, W, H, cfg.glow);
+        const frameForDraw = Object.assign({}, cfg.frame, { imageZoom: cfg.image.zoom, imageOffsetY: cfg.image.offsetY });
+        drawFrame(ctx, frameForDraw, slide.img, H);
+        if (mode === 'framed') {
+            (cfg.texts || []).forEach(t => drawTextItem(ctx, t));
+        }
+    }
+
+    updateRowThumb(slide);
+}
+
+/* =========================================================================
+   UI BUILD
+   ========================================================================= */
+
+let activeSlideIndex = 0;
+
+function getText(cfg, id) { return cfg.texts.find(t => t.id === id); }
+
+function renderAllCards() {
+    const hiddenWrap = document.getElementById('hiddenCanvases');
+    hiddenWrap.innerHTML = '';
+    slides.forEach((s) => {
+        const c = document.createElement('canvas');
+        c.id = `canvas-${s.id}`;
+        c.width = 1080;
+        c.height = 1920;
+        hiddenWrap.appendChild(c);
+        drawSlide(s);
+    });
+    buildRowPreview();
+    document.getElementById('globalConfigJson').value = JSON.stringify(slides[activeSlideIndex].config, null, 2);
+}
+
+function buildRowPreview() {
+    const wrap = document.getElementById('rowPreview');
+    wrap.innerHTML = '';
+    slides.forEach((s, idx) => {
+        const img = document.createElement('img');
+        img.className = 'row-thumb' + (idx === activeSlideIndex ? ' active' : '');
+        img.id = `row-thumb-${s.id}`;
+        img.alt = `Slide ${s.id + 1} preview`;
+        img.title = "Click to upload screenshot";
+        img.addEventListener('click', () => {
+            activeSlideIndex = idx;
+            document.querySelectorAll('.row-thumb').forEach(el => el.classList.remove('active'));
+            img.classList.add('active');
+            document.getElementById('globalConfigJson').value = JSON.stringify(slides[activeSlideIndex].config, null, 2);
+            document.getElementById('hiddenFileInput').click();
+        });
+        wrap.appendChild(img);
+        updateRowThumb(s);
+    });
+}
+
+function updateRowThumb(slide) {
+    const canvas = document.getElementById(`canvas-${slide.id}`);
+    const img = document.getElementById(`row-thumb-${slide.id}`);
+    if (canvas && img) {
+        try { img.src = canvas.toDataURL('image/png'); } catch (e) { }
+    }
+}
+
+document.getElementById('hiddenFileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+            slides[activeSlideIndex].img = img;
+            drawSlide(slides[activeSlideIndex]);
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+});
+
+
+
+document.getElementById('applyGlobalConfigBtn').addEventListener('click', () => {
+    const statusEl = document.getElementById('globalConfigStatus');
+    try {
+        const parsed = JSON.parse(document.getElementById('globalConfigJson').value);
+        if (parsed.hero && parsed.slides) {
+            if (parsed.hero.headline) heroState.headline = parsed.hero.headline;
+            if (parsed.hero.sub) heroState.sub = parsed.hero.sub;
+            drawHeroPoster();
+            
+            parsed.slides.forEach((cfg, i) => {
+                if (slides[i]) {
+                    slides[i].config = cfg;
+                    drawSlide(slides[i]);
+                }
+            });
+            buildRowPreview();
+        } else if (Array.isArray(parsed)) {
+            parsed.forEach((cfg, i) => {
+                if (slides[i]) {
+                    slides[i].config = cfg;
+                    drawSlide(slides[i]);
+                }
+            });
+            buildRowPreview();
+        } else {
+            const idx = typeof parsed.id === 'number' ? parsed.id : activeSlideIndex;
+            if (slides[idx]) {
+                slides[idx].config = parsed;
+                drawSlide(slides[idx]);
+                updateRowThumb(slides[idx]);
+            }
+        }
+        statusEl.textContent = '✓ Applied'; statusEl.className = 'ai-status ok';
+    } catch (err) {
+        statusEl.textContent = '✗ Invalid JSON: ' + err.message; statusEl.className = 'ai-status err';
+    }
+});
+
+/* =========================================================================
+   DOWNLOAD / IMPORT / EXPORT
+   ========================================================================= */
+
+function downloadSlide(slide) {
+    return new Promise((resolve) => {
+        const canvas = document.getElementById(`canvas-${slide.id}`);
+        canvas.toBlob((blob) => {
+            if (!blob) { resolve(); return; }
+            const url = URL.createObjectURL(blob);
+            const eyebrow = getText(slide.config, 'eyebrow');
+            const safeName = (eyebrow.content || 'slide').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${projectSlug()}-slide-${slide.id + 1}-${safeName}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 2000);
+            resolve();
+        }, 'image/png');
+    });
+}
+
+document.getElementById('downloadAllBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('downloadAllBtn');
+    const original = btn.textContent;
+    for (let i = 0; i < slides.length; i++) {
+        btn.textContent = `Downloading ${i + 1} of ${slides.length}...`;
+        await downloadSlide(slides[i]);
+        await new Promise(res => setTimeout(res, 400));
+    }
+    btn.textContent = `Downloading Hero...`;
+    await downloadHeroPoster();
+    await new Promise(res => setTimeout(res, 400));
+    
+    btn.textContent = original;
+});
+
+
+
+/* =========================================================================
+   AI — direct OpenRouter calls (per-slide + global restyle)
+   ========================================================================= */
+
+function readAiSettings() {
+    aiSettings.apiKey = document.getElementById('apiKeyInput').value.trim();
+    aiSettings.model = document.getElementById('modelInput').value.trim() || 'deepseek/deepseek-chat';
+    aiSettings.endpoint = document.getElementById('endpointInput').value.trim() || 'https://openrouter.ai/api/v1/chat/completions';
+}
+
+function stripFences(text) {
+    let t = text.trim();
+    t = t.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
+    return t.trim();
+}
+
+async function callOpenRouter(systemPrompt, userPrompt) {
+    readAiSettings();
+    if (!aiSettings.apiKey) throw new Error('Enter your OpenRouter API key in AI Settings above.');
+    const res = await fetch(aiSettings.endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${aiSettings.apiKey}`,
+        },
+        body: JSON.stringify({
+            model: aiSettings.model,
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt },
+            ],
+            temperature: 0.4,
+        }),
+    });
+    if (!res.ok) {
+        const body = await res.text().catch(() => '');
+        throw new Error(`API error ${res.status}: ${body.slice(0, 300)}`);
+    }
+    const data = await res.json();
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) throw new Error('No content returned by the model.');
+    return content;
+}
+
+async function generateSlideWithAI(slide) {
+    const id = slide.id;
+    const statusEl = document.getElementById(`aistatus-${id}`);
+    const btn = document.getElementById(`aigen-${id}`);
+    const promptText = document.getElementById(`aiprompt-${id}`).value.trim();
+    if (!promptText) { statusEl.textContent = 'Type what you want changed first.'; statusEl.className = 'ai-status err'; return; }
+
+    statusEl.textContent = 'Generating...'; statusEl.className = 'ai-status pending';
+    btn.disabled = true;
+    try {
+        const systemPrompt = `You are a JSON editor for a Play Store promo graphic slide. ${SCHEMA_DOC}
+Here is the CURRENT config for this slide:
+${JSON.stringify(slide.config, null, 2)}
+Apply the user's requested change to this config and return the FULL updated JSON object (same shape, all fields present).`;
+        const raw = await callOpenRouter(systemPrompt, promptText);
+        const parsed = JSON.parse(stripFences(raw));
+        parsed.id = id;
+        slide.config = parsed;
+        drawSlide(slide);
+        syncBasicControlsFromConfig(slide);
+        statusEl.textContent = '✓ Applied'; statusEl.className = 'ai-status ok';
+    } catch (err) {
+        statusEl.textContent = '✗ ' + err.message; statusEl.className = 'ai-status err';
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+document.getElementById('copyPromptBtn').addEventListener('click', async () => {
+    const statusEl = document.getElementById('globalAiStatus');
+    const btn = document.getElementById('copyPromptBtn');
+    const promptText = document.getElementById('globalAiPrompt').value.trim();
+
+    try {
+        const allConfigs = slides.map(s => s.config);
+        const globalObj = { hero: { headline: heroState.headline, sub: heroState.sub }, slides: allConfigs };
+        
+        const textToCopy = `CURRENT CONFIGURATION:
+${JSON.stringify(globalObj, null, 2)}
+
+RULES:
+You are a JSON editor for a Play Store promo graphic set (hero poster + 8 slides).
+${SCHEMA_DOC}
+Apply the user's requested change consistently across the hero poster and all 8 slides. Return ONLY a JSON object containing 'hero' and 'slides', same shape and same order, all fields present, no markdown fences, no commentary.
+
+USER REQUEST:
+${promptText}`;
+        
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(textToCopy);
+        } else {
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            textArea.style.position = "absolute";
+            textArea.style.left = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        }
+        
+        statusEl.textContent = '✓ Copied to clipboard! Paste into AI.'; statusEl.className = 'ai-status ok';
+    } catch (err) {
+        statusEl.textContent = '✗ ' + err.message; statusEl.className = 'ai-status err';
+    }
+});
+
+/* =========================================================================
+   PAGE (TOOL UI) THEME TOGGLE — separate from each slide's own dark/light
+   ========================================================================= */
+
+function projectSlug() {
+    const v = document.getElementById('projectNameInput').value.trim();
+    return v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'store-ready';
+}
+
+function downloadHeroPoster() {
+    return new Promise((resolve) => {
+        const canvas = document.getElementById('heroCanvas');
+        canvas.toBlob((blob) => {
+            if (!blob) { resolve(); return; }
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${projectSlug()}-hero-poster.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 2000);
+            resolve();
+        }, 'image/png');
+    });
+}
+
+// ---------------- HERO POSTER ----------------
+let heroState = {
+    imgs: [null, null, null],
+    headline: 'Effortless Claims\n*For Railway Staff*',
+    sub: 'Just tap to calculate distance, log allowances, and generate PDFs instantly.',
+};
+
+function drawRoundedPhone(ctx, img, cx, cy, w, h, angleDeg, opts) {
+    opts = opts || {};
+    const border = 12, radius = 40;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angleDeg * Math.PI / 180);
+
+    if (opts.shadow !== false) {
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,0,0,0.35)';
+        ctx.shadowBlur = 40;
+        ctx.shadowOffsetY = 18;
+        ctx.fillStyle = '#0A0C10';
+        roundRectPath(ctx, -w / 2, -h / 2, w, h, radius);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    ctx.fillStyle = '#1C1F26';
+    roundRectPath(ctx, -w / 2, -h / 2, w, h, radius);
+    ctx.fill();
+
+    const ix = -w / 2 + border, iy = -h / 2 + border, iw = w - border * 2, ih = h - border * 2;
+    ctx.save();
+    roundRectPath(ctx, ix, iy, iw, ih, radius - border);
+    ctx.clip();
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(ix, iy, iw, ih);
+
+    if (img) {
+        const baseScale = iw / img.width;
+        const drawW = img.width * baseScale;
+        const drawH = img.height * baseScale;
+        ctx.drawImage(img, ix, iy, drawW, drawH);
+    } else {
+        ctx.fillStyle = '#ECEDF1';
+        ctx.fillRect(ix, iy, iw, ih);
+        ctx.fillStyle = '#A6ACB8';
+        ctx.font = '700 22px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Upload screenshot', 0, 0);
+    }
+    ctx.restore();
+
+    if (opts.dim) {
+        ctx.fillStyle = `rgba(10,12,16,${opts.dim})`;
+        roundRectPath(ctx, -w / 2, -h / 2, w, h, radius);
+        ctx.fill();
+    }
+
+    ctx.restore();
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    const words = text.split(' ');
+    let line = '';
+    let curY = y;
+    ctx.textAlign = 'left';
+    words.forEach((word) => {
+        const test = line + word + ' ';
+        if (ctx.measureText(test).width > maxWidth && line !== '') {
+            ctx.fillText(line, x, curY);
+            line = word + ' ';
+            curY += lineHeight;
+        } else {
+            line = test;
+        }
+    });
+    ctx.fillText(line, x, curY);
+}
+
+function drawPlayBadge(ctx, x, y) {
+    const w = 240, h = 72;
+    ctx.fillStyle = '#000000';
+    roundRectPath(ctx, x, y, w, h, 10);
+    ctx.fill();
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.moveTo(x + 25, y + 20);
+    ctx.lineTo(x + 25, y + h - 20);
+    ctx.lineTo(x + 47, y + h / 2);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.font = '600 13px Inter, sans-serif';
+    ctx.fillText('GET IT ON', x + 62, y + 28);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '700 24px Inter, sans-serif';
+    ctx.fillText('Google Play', x + 62, y + 55);
+}
+
+function drawHeroPoster() {
+    const canvas = document.getElementById('heroCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = 1024, H = 500;
+    ctx.clearRect(0, 0, W, H);
+
+    const bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#FFFFFF');
+    bg.addColorStop(1, '#F4F5F8');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    const glow = ctx.createRadialGradient(W * 0.78, H * 0.25, 50, W * 0.78, H * 0.25, 350);
+    glow.addColorStop(0, 'rgba(232,112,58,0.12)');
+    glow.addColorStop(1, 'rgba(232,112,58,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    const textX = 70;
+    let textY = 140;
+    const lines = heroState.headline.split('\n');
+    ctx.textBaseline = 'alphabetic';
+    const headlineFont = '900 50px Inter, sans-serif';
+    const lineHeight = 66;
+    ctx.font = headlineFont;
+    lines.forEach((line, i) => {
+        const parts = line.split('*');
+        let cx = textX;
+        ctx.textAlign = 'left';
+        parts.forEach((part, pi) => {
+            ctx.fillStyle = (pi % 2 === 1) ? '#E8703A' : '#1C1F26';
+            ctx.fillText(part, cx, textY + i * lineHeight);
+            cx += ctx.measureText(part).width;
+        });
+    });
+
+    const subY = textY + lines.length * lineHeight + 10;
+    ctx.font = '500 26px Inter, sans-serif';
+    ctx.fillStyle = 'rgba(28, 31, 38, 0.65)';
+    wrapText(ctx, heroState.sub, textX, subY, 480, 36);
+
+    drawPlayBadge(ctx, textX, H - 100);
+
+    const pivotX = W - 260, pivotY = H + 60;
+    const phoneW = 200, phoneH = 410;
+
+    drawRoundedPhone(ctx, heroState.imgs[0], pivotX - 100, pivotY - 300, phoneW, phoneH, -16, { dim: 0.28 });
+    drawRoundedPhone(ctx, heroState.imgs[2], pivotX + 130, pivotY - 280, phoneW, phoneH, 16, { dim: 0.28 });
+    drawRoundedPhone(ctx, heroState.imgs[1], pivotX + 15, pivotY - 320, phoneW, phoneH, -2, { dim: 0 });
+}
+
+function wireHero() {
+    for (let i = 0; i < 3; i++) {
+        const file = document.getElementById(`hero-file-${i}`);
+        if (!file) continue;
+        file.addEventListener('change', (e) => {
+            const f = e.target.files[0];
+            if (!f) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    heroState.imgs[i] = img;
+                    drawHeroPoster();
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(f);
+            e.target.value = '';
+        });
+    }
+
+    const clickArea = document.getElementById('heroPosterClickArea');
+    if (clickArea) {
+        clickArea.addEventListener('click', (e) => {
+            const rect = clickArea.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const ratio = x / rect.width;
+            
+            if (ratio > 0.5) {
+                if (ratio < 0.66) document.getElementById('hero-file-0').click();
+                else if (ratio < 0.83) document.getElementById('hero-file-1').click();
+                else document.getElementById('hero-file-2').click();
+            }
+        });
+    }
+    
+    drawHeroPoster();
+}
+
+/* =========================================================================
+   INIT
+   ========================================================================= */
+
+document.fonts.load('900 76px Inter').then(() => {
+    document.fonts.load('800 24px Inter').then(() => {
+        renderAllCards();
+        wireHero();
+    });
+});
+setTimeout(() => { renderAllCards(); wireHero(); }, 800);
+
+document.getElementById('projectNameInput').addEventListener('input', (e) => {
+    const val = e.target.value.trim() || 'Store Ready';
+    document.getElementById('psTitle').textContent = val;
+    
+    const words = val.split(' ').filter(w => w.length > 0);
+    let iconText = '';
+    if (words.length > 1) {
+        iconText = words[0][0] + words[1][0];
+    } else {
+        iconText = val.substring(0, 2);
+    }
+    document.getElementById('psIcon').textContent = iconText.toUpperCase();
+});
+
+document.getElementById('schemaHelpBlock').textContent = SCHEMA_DOC;
+</script>
+</body>
+</html>
