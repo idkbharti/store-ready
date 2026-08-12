@@ -490,6 +490,16 @@
         <div class="row-preview" id="rowPreview"></div>
     </div>
     
+    <div class="active-slide-interactive" style="display: flex; justify-content: center; margin-bottom: 24px; padding: 24px; background: var(--card); border-radius: 16px; border: 1px solid var(--line);">
+        <div style="text-align: center;">
+            <h2 class="section-title">Active Slide Interactive Preview</h2>
+            <p class="sub" style="margin-bottom: 12px; font-size: 12px;">Drag text or the phone frame to position them.</p>
+            <div class="canvas-frame interactive-frame" style="width: 270px; height: 480px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--card-flat); position: relative; cursor: grab; margin: 0 auto;" id="activeSlideClickArea">
+                <canvas id="activeSlideCanvas" width="1080" height="1920" style="position: absolute; top: 0; left: 0; transform-origin: top left; transform: scale(0.25)"></canvas>
+            </div>
+        </div>
+    </div>
+    
     <div class="split-pane">
         <div class="split-left">
             <h2 class="section-title">AI Restyle</h2>
@@ -869,6 +879,15 @@ function drawSlide(slide) {
         }
     }
 
+    if (slide.id === activeSlideIndex) {
+        const activeCanvas = document.getElementById('activeSlideCanvas');
+        if (activeCanvas) {
+            const actCtx = activeCanvas.getContext('2d');
+            activeCanvas.width = W; activeCanvas.height = H;
+            actCtx.drawImage(canvas, 0, 0);
+        }
+    }
+
     updateRowThumb(slide);
 }
 
@@ -911,6 +930,7 @@ function buildRowPreview() {
             img.classList.add('active');
             const globalObj = { hero: { headline: heroState.headline, sub: heroState.sub }, slides: slides.map(s => s.config) };
             document.getElementById('globalConfigJson').value = JSON.stringify(globalObj, null, 2);
+            drawSlide(slides[activeSlideIndex]); // Redraw to update active canvas
             document.getElementById('hiddenFileInput').click();
         });
         wrap.appendChild(img);
@@ -1166,6 +1186,12 @@ let heroState = {
     imgs: [null, null, null],
     headline: 'Effortless Claims\n*For Railway Staff*',
     sub: 'Just tap to calculate distance, log allowances, and generate PDFs instantly.',
+    textX: 70, textY: 140,
+    phones: [
+        { x: -100, y: -300, tilt: -16 },
+        { x: 130, y: -280, tilt: 16 },
+        { x: 15, y: -320, tilt: -2 }
+    ]
 };
 
 function drawRoundedPhone(ctx, img, cx, cy, w, h, angleDeg, opts) {
@@ -1281,8 +1307,8 @@ function drawHeroPoster() {
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, W, H);
 
-    const textX = 70;
-    let textY = 140;
+    const textX = heroState.textX;
+    let textY = heroState.textY;
     const lines = heroState.headline.split('\n');
     ctx.textBaseline = 'alphabetic';
     const headlineFont = '900 50px Inter, sans-serif';
@@ -1309,9 +1335,9 @@ function drawHeroPoster() {
     const pivotX = W - 260, pivotY = H + 60;
     const phoneW = 200, phoneH = 410;
 
-    drawRoundedPhone(ctx, heroState.imgs[0], pivotX - 100, pivotY - 300, phoneW, phoneH, -16, { dim: 0.28 });
-    drawRoundedPhone(ctx, heroState.imgs[2], pivotX + 130, pivotY - 280, phoneW, phoneH, 16, { dim: 0.28 });
-    drawRoundedPhone(ctx, heroState.imgs[1], pivotX + 15, pivotY - 320, phoneW, phoneH, -2, { dim: 0 });
+    drawRoundedPhone(ctx, heroState.imgs[0], pivotX + heroState.phones[0].x, pivotY + heroState.phones[0].y, phoneW, phoneH, heroState.phones[0].tilt, { dim: 0.28 });
+    drawRoundedPhone(ctx, heroState.imgs[2], pivotX + heroState.phones[1].x, pivotY + heroState.phones[1].y, phoneW, phoneH, heroState.phones[1].tilt, { dim: 0.28 });
+    drawRoundedPhone(ctx, heroState.imgs[1], pivotX + heroState.phones[2].x, pivotY + heroState.phones[2].y, phoneW, phoneH, heroState.phones[2].tilt, { dim: 0 });
 }
 
 function wireHero() {
@@ -1371,6 +1397,179 @@ document.getElementById('projectNameInput').addEventListener('input', (e) => {
 });
 
 document.getElementById('schemaHelpBlock').textContent = SCHEMA_DOC;
+
+/* =========================================================================
+   INTERACTION LOGIC (PAN RESPONDER)
+   ========================================================================= */
+
+function setupDragLogic() {
+    let draggingObj = null;
+    let dragType = null;
+    let startX = 0, startY = 0;
+    let objStartX = 0, objStartY = 0;
+
+    const activeCanvas = document.getElementById('activeSlideCanvas');
+    const heroCanvas = document.getElementById('heroCanvas');
+
+    function getMousePos(canvas, evt, scale) {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        return {
+            x: (evt.clientX - rect.left) / scale,
+            y: (evt.clientY - rect.top) / scale
+        };
+    }
+    
+    function syncGlobalJson() {
+        const globalObj = { hero: { headline: heroState.headline, sub: heroState.sub }, slides: slides.map(s => s.config) };
+        document.getElementById('globalConfigJson').value = JSON.stringify(globalObj, null, 2);
+    }
+
+    if (activeCanvas) {
+        activeCanvas.parentElement.addEventListener('mousedown', (e) => {
+            const pos = getMousePos(activeCanvas, e, 0.25);
+            const slide = slides[activeSlideIndex].config;
+            
+            for (let t of slide.texts || []) {
+                if (Math.abs(pos.x - t.x) < 300 && Math.abs(pos.y - t.y) < 150) {
+                    draggingObj = t; dragType = 'text';
+                    startX = pos.x; startY = pos.y; objStartX = t.x; objStartY = t.y;
+                    return;
+                }
+            }
+            
+            const f = slide.frame;
+            if (pos.x >= f.x && pos.x <= f.x + f.width && pos.y >= f.y && pos.y <= f.y + f.height) {
+                draggingObj = f; dragType = 'frame';
+                startX = pos.x; startY = pos.y; objStartX = f.x; objStartY = f.y;
+                return;
+            }
+        });
+        
+        activeCanvas.parentElement.addEventListener('dblclick', (e) => {
+            const pos = getMousePos(activeCanvas, e, 0.25);
+            const slide = slides[activeSlideIndex].config;
+            for (let t of slide.texts || []) {
+                if (Math.abs(pos.x - t.x) < 300 && Math.abs(pos.y - t.y) < 150) {
+                    const newText = prompt('Edit text:', t.content);
+                    if (newText !== null) {
+                        t.content = newText;
+                        drawSlide(slides[activeSlideIndex]);
+                        syncGlobalJson();
+                    }
+                    return;
+                }
+            }
+        });
+    }
+
+    if (heroCanvas) {
+        heroCanvas.parentElement.addEventListener('mousedown', (e) => {
+            const rect = heroCanvas.parentElement.getBoundingClientRect();
+            const ratio = (e.clientX - rect.left) / rect.width;
+            if (ratio > 0.5) return;
+
+            const pos = getMousePos(heroCanvas, e, 0.46875);
+            
+            if (pos.x > heroState.textX - 20 && pos.x < heroState.textX + 400 && pos.y > heroState.textY - 80 && pos.y < heroState.textY + 200) {
+                draggingObj = heroState; dragType = 'hero_text';
+                startX = pos.x; startY = pos.y; objStartX = heroState.textX; objStartY = heroState.textY;
+                return;
+            }
+            
+            const W = 1024, H = 500;
+            const pivotX = W - 260, pivotY = H + 60;
+            const checkOrder = [1, 2, 0];
+            for (let i of checkOrder) {
+                const p = heroState.phones[i];
+                const px = pivotX + p.x;
+                const py = pivotY + p.y;
+                if (pos.x > px - 100 && pos.x < px + 100 && pos.y > py - 205 && pos.y < py + 205) {
+                    draggingObj = p; dragType = 'hero_phone';
+                    startX = pos.x; startY = pos.y; objStartX = p.x; objStartY = p.y;
+                    return;
+                }
+            }
+        });
+        
+        heroCanvas.parentElement.addEventListener('dblclick', (e) => {
+            const rect = heroCanvas.parentElement.getBoundingClientRect();
+            const ratio = (e.clientX - rect.left) / rect.width;
+            if (ratio > 0.5) return;
+
+            const pos = getMousePos(heroCanvas, e, 0.46875);
+            
+            const lines = heroState.headline.split('\n');
+            const headlineH = lines.length * 66;
+            const subYStart = heroState.textY + headlineH;
+
+            // Subtext hit test
+            if (pos.x > heroState.textX - 20 && pos.x < heroState.textX + 400 && pos.y > subYStart - 20 && pos.y < subYStart + 150) {
+                const newSub = prompt('Edit Subtext:', heroState.sub);
+                if (newSub !== null) {
+                    heroState.sub = newSub;
+                    drawHeroPoster();
+                    syncGlobalJson();
+                }
+                return;
+            }
+
+            // Headline hit test
+            if (pos.x > heroState.textX - 20 && pos.x < heroState.textX + 400 && pos.y > heroState.textY - 50 && pos.y < heroState.textY + headlineH) {
+                const newText = prompt('Edit Headline (use \\n for breaks, *word* for highlight):', heroState.headline);
+                if (newText !== null) {
+                    heroState.headline = newText;
+                    drawHeroPoster();
+                    syncGlobalJson();
+                }
+            }
+        });
+    }
+
+    window.addEventListener('mousemove', (e) => {
+        if (!draggingObj) return;
+        
+        if (dragType === 'text' || dragType === 'frame') {
+            const pos = getMousePos(activeCanvas, e, 0.25);
+            const dx = pos.x - startX;
+            const dy = pos.y - startY;
+            
+            if (e.shiftKey && dragType === 'frame') {
+                draggingObj.tilt = Math.max(-15, Math.min(15, (draggingObj.tilt || 0) + dx * 0.1));
+                startX = pos.x; 
+            } else {
+                draggingObj.x = objStartX + dx;
+                draggingObj.y = objStartY + dy;
+            }
+            drawSlide(slides[activeSlideIndex]);
+            syncGlobalJson();
+        } 
+        else if (dragType === 'hero_text' || dragType === 'hero_phone') {
+            const pos = getMousePos(heroCanvas, e, 0.46875);
+            const dx = pos.x - startX;
+            const dy = pos.y - startY;
+            
+            if (dragType === 'hero_text') {
+                draggingObj.textX = objStartX + dx;
+                draggingObj.textY = objStartY + dy;
+            } else if (dragType === 'hero_phone') {
+                if (e.shiftKey) {
+                    draggingObj.tilt = Math.max(-45, Math.min(45, (draggingObj.tilt || 0) + dx * 0.1));
+                    startX = pos.x;
+                } else {
+                    draggingObj.x = objStartX + dx;
+                    draggingObj.y = objStartY + dy;
+                }
+            }
+            drawHeroPoster();
+            syncGlobalJson();
+        }
+    });
+
+    window.addEventListener('mouseup', () => { draggingObj = null; dragType = null; });
+}
+
+setTimeout(setupDragLogic, 1000);
+
 </script>
 </body>
 </html>
