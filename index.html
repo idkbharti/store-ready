@@ -503,8 +503,8 @@
             </div>
         </div>
         <div class="split-right">
-            <h2 class="section-title">Slide Configuration</h2>
-            <p class="sub" style="margin-bottom: 12px;">Edit the active slide below, or paste an array of all 8 slides.</p>
+            <h2 class="section-title">Global Configuration</h2>
+            <p class="sub" style="margin-bottom: 12px;">Edit the full configuration below (hero poster and all slides).</p>
             <details class="settings" style="margin: 0 0 14px 0; padding: 10px 14px;">
                 <summary style="color: var(--orange); font-size: 12px;">View Configuration Rules & Allowed Values</summary>
                 <div class="settings-note" style="margin-top: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; white-space: pre-wrap; color: var(--ink-soft);" id="schemaHelpBlock"></div>
@@ -892,7 +892,8 @@ function renderAllCards() {
         drawSlide(s);
     });
     buildRowPreview();
-    document.getElementById('globalConfigJson').value = JSON.stringify(slides[activeSlideIndex].config, null, 2);
+    const globalObj = { hero: { headline: heroState.headline, sub: heroState.sub }, slides: slides.map(s => s.config) };
+    document.getElementById('globalConfigJson').value = JSON.stringify(globalObj, null, 2);
 }
 
 function buildRowPreview() {
@@ -908,7 +909,8 @@ function buildRowPreview() {
             activeSlideIndex = idx;
             document.querySelectorAll('.row-thumb').forEach(el => el.classList.remove('active'));
             img.classList.add('active');
-            document.getElementById('globalConfigJson').value = JSON.stringify(slides[activeSlideIndex].config, null, 2);
+            const globalObj = { hero: { headline: heroState.headline, sub: heroState.sub }, slides: slides.map(s => s.config) };
+            document.getElementById('globalConfigJson').value = JSON.stringify(globalObj, null, 2);
             document.getElementById('hiddenFileInput').click();
         });
         wrap.appendChild(img);
