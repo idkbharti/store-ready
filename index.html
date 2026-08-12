@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Store Ready</title>
-    <link rel="icon" type="image/png" href="./images.png">
+    <link rel="icon" type="image/jpeg" href="./images.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
@@ -445,7 +445,7 @@
     <div class="top">
         <div class="eyebrow-top">Utility Tool</div>
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
-            <img src="./images.png" alt="Store Ready logo" class="site-logo">
+            <img src="./images.jpg" alt="Store Ready logo" class="site-logo">
             <h1>Store Ready</h1>
         </div>
         <p class="sub">Every slide is a JSON spec (background, frame, spacing, and every text element with its own font/color/position). Edit visually, edit the raw JSON, describe the change in plain English for AI to edit the JSON, or pick a ready-made background preset below.</p>
@@ -463,7 +463,7 @@
         <div class="ps-header">
             <div class="ps-header-left">
                 <div class="ps-icon" id="psIcon">
-                    <img src="./images.png" alt="Store Ready logo">
+                    <img src="./images.jpg" alt="Store Ready logo">
                 </div>
                 <div class="ps-details">
                     <div class="ps-title" id="psTitle">Store Ready</div>
@@ -486,18 +486,7 @@
                 <input type="file" accept="image/*" id="hero-file-2" style="display:none;">
             </div>
         </div>
-        
         <div class="row-preview" id="rowPreview"></div>
-    </div>
-    
-    <div class="active-slide-interactive" style="display: flex; justify-content: center; margin-bottom: 24px; padding: 24px; background: var(--card); border-radius: 16px; border: 1px solid var(--line);">
-        <div style="text-align: center;">
-            <h2 class="section-title">Active Slide Interactive Preview</h2>
-            <p class="sub" style="margin-bottom: 12px; font-size: 12px;">Drag text or the phone frame to position them.</p>
-            <div class="canvas-frame interactive-frame" style="width: 270px; height: 480px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--card-flat); position: relative; cursor: grab; margin: 0 auto;" id="activeSlideClickArea">
-                <canvas id="activeSlideCanvas" width="1080" height="1920" style="position: absolute; top: 0; left: 0; transform-origin: top left; transform: scale(0.25)"></canvas>
-            </div>
-        </div>
     </div>
     
     <div class="split-pane">
@@ -731,6 +720,12 @@ function drawHighlightLine(ctx, rawLine, x, y, align, baseColor, highlightColor)
 }
 
 function drawTextItem(ctx, t) {
+    ctx.save();
+    if (t.rotation) {
+        ctx.translate(t.x, t.y);
+        ctx.rotate(t.rotation * Math.PI / 180);
+        ctx.translate(-t.x, -t.y);
+    }
     const font = `${t.fontWeight || 400} ${t.fontSize}px ${t.fontFamily || 'Inter'}, sans-serif`;
     ctx.font = font;
     ctx.textAlign = t.align || 'center';
@@ -749,6 +744,7 @@ function drawTextItem(ctx, t) {
             ctx.fillText(line, t.x, y);
         }
     });
+    ctx.restore();
 }
 
 function drawFrame(ctx, frame, img, H) {
@@ -878,17 +874,112 @@ function drawSlide(slide) {
             (cfg.texts || []).forEach(t => drawTextItem(ctx, t));
         }
     }
-
-    if (slide.id === activeSlideIndex) {
-        const activeCanvas = document.getElementById('activeSlideCanvas');
-        if (activeCanvas) {
-            const actCtx = activeCanvas.getContext('2d');
-            activeCanvas.width = W; activeCanvas.height = H;
-            actCtx.drawImage(canvas, 0, 0);
-        }
+    
+    if (window.transformModeObj && window.transformObjSlide === slide.id) {
+        drawTransformHandle(ctx, window.transformModeObj, window.transformModeType);
     }
 
     updateRowThumb(slide);
+}
+
+function drawTransformHandle(ctx, obj, type) {
+    ctx.save();
+    ctx.strokeStyle = '#007AFF';
+    ctx.lineWidth = 4;
+    ctx.fillStyle = '#FFFFFF';
+    
+    if (type === 'text') {
+        const lines = (obj.content || '').split('\n');
+        const fs = obj.fontSize || 50;
+        const lh = obj.lineHeight || fs * 1.2;
+        const h = lines.length * lh;
+        
+        ctx.translate(obj.x, obj.y);
+        if (obj.rotation) ctx.rotate(obj.rotation * Math.PI / 180);
+        
+        const w = 450;
+        ctx.strokeRect(-w/2, -fs - 20, w, h + 40);
+        
+        ctx.beginPath();
+        ctx.moveTo(0, -fs - 20);
+        ctx.lineTo(0, -fs - 80);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.arc(0, -fs - 80, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+    } else if (type === 'hero_text') {
+        const lines = (obj.headline || '').split('\n');
+        const h = lines.length * 66;
+        
+        ctx.translate(obj.textX, obj.textY);
+        if (obj.headlineRotation) ctx.rotate(obj.headlineRotation * Math.PI / 180);
+        
+        ctx.strokeRect(-20, -50, 450, h + 20);
+        
+        ctx.beginPath();
+        ctx.moveTo(200, -50);
+        ctx.lineTo(200, -80);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.arc(200, -80, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+    } else if (type === 'hero_sub') {
+        const subX = obj.subX || obj.textX;
+        const subY = obj.subY || (obj.textY + obj.headline.split('\n').length * 66);
+        ctx.translate(subX, subY);
+        if (obj.subRotation) ctx.rotate(obj.subRotation * Math.PI / 180);
+        
+        ctx.strokeRect(-20, -25, 450, 50);
+        
+        ctx.beginPath();
+        ctx.moveTo(200, -25);
+        ctx.lineTo(200, -50);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.arc(200, -50, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+    } else if (type === 'hero_phone') {
+        const W = 1024, H = 500;
+        const pivotX = W - 260, pivotY = H + 60;
+        ctx.translate(pivotX + obj.x, pivotY + obj.y);
+        if (obj.tilt) ctx.rotate(obj.tilt * Math.PI / 180);
+        
+        ctx.strokeRect(-100, -200, 200, 400);
+        
+        ctx.beginPath();
+        ctx.moveTo(0, -200);
+        ctx.lineTo(0, -240);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.arc(0, -240, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+    } else if (type === 'frame') {
+        ctx.translate(obj.x + obj.width/2, obj.y + obj.height/2);
+        if (obj.tilt) ctx.rotate(obj.tilt * Math.PI / 180);
+        
+        ctx.strokeRect(-obj.width/2, -obj.height/2, obj.width, obj.height);
+        
+        ctx.beginPath();
+        ctx.moveTo(0, -obj.height/2);
+        ctx.lineTo(0, -obj.height/2 - 80);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.arc(0, -obj.height/2 - 80, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+    }
+    
+    ctx.restore();
 }
 
 /* =========================================================================
@@ -924,14 +1015,29 @@ function buildRowPreview() {
         img.id = `row-thumb-${s.id}`;
         img.alt = `Slide ${s.id + 1} preview`;
         img.title = "Click to upload screenshot";
-        img.addEventListener('click', () => {
+        img.addEventListener('click', (e) => {
+            // Prevent click firing if we just finished a drag or if it's a double/triple click
+            if (window.isDraggingSlideImg || e.detail > 1) return;
+            
             activeSlideIndex = idx;
             document.querySelectorAll('.row-thumb').forEach(el => el.classList.remove('active'));
             img.classList.add('active');
             const globalObj = { hero: { headline: heroState.headline, sub: heroState.sub }, slides: slides.map(s => s.config) };
             document.getElementById('globalConfigJson').value = JSON.stringify(globalObj, null, 2);
-            drawSlide(slides[activeSlideIndex]); // Redraw to update active canvas
-            document.getElementById('hiddenFileInput').click();
+            
+            // Check if click was specifically on the "Upload screenshot" text (center of the frame)
+            const rect = img.getBoundingClientRect();
+            const scale = rect.width / 1080;
+            const pos = { x: (e.clientX - rect.left) / scale, y: (e.clientY - rect.top) / scale };
+            
+            const f = slides[activeSlideIndex].config.frame;
+            const cx = f.x + f.width / 2;
+            const cy = f.y + f.height / 2;
+            
+            // Tight bounding box around the center where the text is drawn
+            if (Math.abs(pos.x - cx) < 250 && Math.abs(pos.y - cy) < 150) {
+                document.getElementById('hiddenFileInput').click();
+            }
         });
         wrap.appendChild(img);
         updateRowThumb(s);
@@ -1407,53 +1513,118 @@ function setupDragLogic() {
     let dragType = null;
     let startX = 0, startY = 0;
     let objStartX = 0, objStartY = 0;
+    let objStartRot = 0;
+    let isRotating = false;
 
-    const activeCanvas = document.getElementById('activeSlideCanvas');
+    let isDragging = false;
+    window.isDraggingSlideImg = false;
+    window.transformModeObj = null;
+    window.transformObjSlide = null;
+    window.transformModeType = null;
+    
+    const rowPreview = document.getElementById('rowPreview');
     const heroCanvas = document.getElementById('heroCanvas');
 
-    function getMousePos(canvas, evt, scale) {
-        const rect = canvas.parentElement.getBoundingClientRect();
-        return {
-            x: (evt.clientX - rect.left) / scale,
-            y: (evt.clientY - rect.top) / scale
-        };
-    }
-    
     function syncGlobalJson() {
         const globalObj = { hero: { headline: heroState.headline, sub: heroState.sub }, slides: slides.map(s => s.config) };
         document.getElementById('globalConfigJson').value = JSON.stringify(globalObj, null, 2);
     }
 
-    if (activeCanvas) {
-        activeCanvas.parentElement.addEventListener('mousedown', (e) => {
-            const pos = getMousePos(activeCanvas, e, 0.25);
-            const slide = slides[activeSlideIndex].config;
+    if (rowPreview) {
+        rowPreview.addEventListener('mousedown', (e) => {
+            if (!e.target.classList.contains('row-thumb')) return;
+            e.preventDefault(); 
+            const slideId = parseInt(e.target.id.replace('row-thumb-', ''));
+            const rect = e.target.getBoundingClientRect();
+            const scale = rect.width / 1080;
+            const pos = { x: (e.clientX - rect.left) / scale, y: (e.clientY - rect.top) / scale };
             
-            for (let t of slide.texts || []) {
-                if (Math.abs(pos.x - t.x) < 300 && Math.abs(pos.y - t.y) < 150) {
-                    draggingObj = t; dragType = 'text';
-                    startX = pos.x; startY = pos.y; objStartX = t.x; objStartY = t.y;
+            const slide = slides[slideId].config;
+            activeSlideIndex = slideId;
+            document.querySelectorAll('.row-thumb').forEach(el => el.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            // Check transform mode handle
+            if (window.transformModeObj && window.transformObjSlide === slideId) {
+                const obj = window.transformModeObj;
+                if (window.transformModeType === 'text') {
+                    const fs = obj.fontSize || 50;
+                    if (Math.abs(pos.x - obj.x) < 30 && Math.abs(pos.y - (obj.y - fs - 80)) < 30) {
+                        isRotating = true;
+                        draggingObj = obj; dragType = 'text';
+                        startX = pos.x; startY = pos.y; objStartRot = obj.rotation || 0;
+                        return;
+                    }
+                } else if (window.transformModeType === 'frame') {
+                    const cx = obj.x + obj.width/2;
+                    const cy = obj.y + obj.height/2;
+                    if (Math.abs(pos.x - cx) < 30 && Math.abs(pos.y - (cy - obj.height/2 - 80)) < 30) {
+                        isRotating = true;
+                        draggingObj = obj; dragType = 'frame';
+                        startX = pos.x; startY = pos.y; objStartRot = obj.tilt || 0;
+                        return;
+                    }
+                }
+            }
+
+            const texts = slide.texts || [];
+            for (let i = texts.length - 1; i >= 0; i--) {
+                const t = texts[i];
+                const lines = (t.content || '').split('\n');
+                const fs = t.fontSize || 50;
+                const h = lines.length * (t.lineHeight || fs * 1.2);
+                if (Math.abs(pos.x - t.x) < 450 && pos.y > t.y - fs - 20 && pos.y < t.y + h - fs + 20) {
+                    if (e.detail >= 3) {
+                        window.transformModeObj = t; window.transformModeType = 'text'; window.transformObjSlide = slideId;
+                        drawSlide(slides[slideId]);
+                    }
+                    if (window.transformModeObj === t) {
+                        isRotating = false; draggingObj = t; dragType = 'text';
+                        startX = pos.x; startY = pos.y; objStartX = t.x; objStartY = t.y;
+                    }
                     return;
                 }
             }
             
             const f = slide.frame;
             if (pos.x >= f.x && pos.x <= f.x + f.width && pos.y >= f.y && pos.y <= f.y + f.height) {
-                draggingObj = f; dragType = 'frame';
-                startX = pos.x; startY = pos.y; objStartX = f.x; objStartY = f.y;
+                if (e.detail >= 3) {
+                    window.transformModeObj = f; window.transformModeType = 'frame'; window.transformObjSlide = slideId;
+                    drawSlide(slides[slideId]);
+                }
+                if (window.transformModeObj === f) {
+                    isRotating = false; draggingObj = f; dragType = 'frame';
+                    startX = pos.x; startY = pos.y; objStartX = f.x; objStartY = f.y;
+                }
                 return;
+            }
+
+            // Clicked empty space
+            if (window.transformModeObj) {
+                window.transformModeObj = null;
+                drawSlide(slides[slideId]);
             }
         });
         
-        activeCanvas.parentElement.addEventListener('dblclick', (e) => {
-            const pos = getMousePos(activeCanvas, e, 0.25);
-            const slide = slides[activeSlideIndex].config;
-            for (let t of slide.texts || []) {
-                if (Math.abs(pos.x - t.x) < 300 && Math.abs(pos.y - t.y) < 150) {
-                    const newText = prompt('Edit text:', t.content);
+        rowPreview.addEventListener('dblclick', (e) => {
+            if (!e.target.classList.contains('row-thumb')) return;
+            const slideId = parseInt(e.target.id.replace('row-thumb-', ''));
+            const rect = e.target.getBoundingClientRect();
+            const scale = rect.width / 1080;
+            const pos = { x: (e.clientX - rect.left) / scale, y: (e.clientY - rect.top) / scale };
+            
+            const slide = slides[slideId].config;
+            const texts = slide.texts || [];
+            for (let i = texts.length - 1; i >= 0; i--) {
+                const t = texts[i];
+                const lines = (t.content || '').split('\n');
+                const fs = t.fontSize || 50;
+                const h = lines.length * (t.lineHeight || fs * 1.2);
+                if (Math.abs(pos.x - t.x) < 450 && pos.y > t.y - fs - 20 && pos.y < t.y + h - fs + 20) {
+                    const newText = prompt(`Edit text (${t.id}):`, t.content);
                     if (newText !== null) {
                         t.content = newText;
-                        drawSlide(slides[activeSlideIndex]);
+                        drawSlide(slides[slideId]);
                         syncGlobalJson();
                     }
                     return;
@@ -1470,9 +1641,64 @@ function setupDragLogic() {
 
             const pos = getMousePos(heroCanvas, e, 0.46875);
             
-            if (pos.x > heroState.textX - 20 && pos.x < heroState.textX + 400 && pos.y > heroState.textY - 80 && pos.y < heroState.textY + 200) {
-                draggingObj = heroState; dragType = 'hero_text';
-                startX = pos.x; startY = pos.y; objStartX = heroState.textX; objStartY = heroState.textY;
+            if (window.transformModeObj && window.transformObjHero) {
+                const obj = window.transformModeObj;
+                if (window.transformModeType === 'hero_text') {
+                    if (Math.abs(pos.x - obj.textX) < 30 && Math.abs(pos.y - (obj.textY - 80)) < 30) {
+                        isRotating = true; draggingObj = obj; dragType = 'hero_text';
+                        startX = pos.x; startY = pos.y; objStartRot = obj.headlineRotation || 0;
+                        return;
+                    }
+                } else if (window.transformModeType === 'hero_sub') {
+                    const subX = obj.subX || obj.textX;
+                    const subY = obj.subY || (obj.textY + obj.headline.split('\n').length * 66);
+                    if (Math.abs(pos.x - subX) < 30 && Math.abs(pos.y - (subY - 60)) < 30) {
+                        isRotating = true; draggingObj = obj; dragType = 'hero_sub';
+                        startX = pos.x; startY = pos.y; objStartRot = obj.subRotation || 0;
+                        return;
+                    }
+                } else if (window.transformModeType === 'hero_phone') {
+                    const W = 1024, H = 500;
+                    const pivotX = W - 260, pivotY = H + 60;
+                    const px = pivotX + obj.x;
+                    const py = pivotY + obj.y;
+                    if (Math.abs(pos.x - px) < 30 && Math.abs(pos.y - (py - 250)) < 30) {
+                        isRotating = true; draggingObj = obj; dragType = 'hero_phone';
+                        startX = pos.x; startY = pos.y; objStartRot = obj.tilt || 0;
+                        return;
+                    }
+                }
+            }
+
+            const lines = heroState.headline.split('\n');
+            const headlineH = lines.length * 66;
+            const subYStart = heroState.textY + headlineH;
+            const currentSubX = heroState.subX || heroState.textX;
+            const currentSubY = heroState.subY || subYStart;
+            
+            // Subtext hit test
+            if (pos.x > currentSubX - 20 && pos.x < currentSubX + 400 && pos.y > currentSubY - 20 && pos.y < currentSubY + 60) {
+                if (e.detail >= 3) {
+                    window.transformModeObj = heroState; window.transformModeType = 'hero_sub'; window.transformObjHero = true;
+                    drawHeroPoster();
+                }
+                if (window.transformModeObj === heroState && window.transformModeType === 'hero_sub') {
+                    isRotating = false; draggingObj = heroState; dragType = 'hero_sub';
+                    startX = pos.x; startY = pos.y; objStartX = currentSubX; objStartY = currentSubY;
+                }
+                return;
+            }
+
+            // Headline hit test
+            if (pos.x > heroState.textX - 20 && pos.x < heroState.textX + 400 && pos.y > heroState.textY - 50 && pos.y < heroState.textY + headlineH) {
+                if (e.detail >= 3) {
+                    window.transformModeObj = heroState; window.transformModeType = 'hero_text'; window.transformObjHero = true;
+                    drawHeroPoster();
+                }
+                if (window.transformModeObj === heroState && window.transformModeType === 'hero_text') {
+                    isRotating = false; draggingObj = heroState; dragType = 'hero_text';
+                    startX = pos.x; startY = pos.y; objStartX = heroState.textX; objStartY = heroState.textY;
+                }
                 return;
             }
             
@@ -1484,10 +1710,23 @@ function setupDragLogic() {
                 const px = pivotX + p.x;
                 const py = pivotY + p.y;
                 if (pos.x > px - 100 && pos.x < px + 100 && pos.y > py - 205 && pos.y < py + 205) {
-                    draggingObj = p; dragType = 'hero_phone';
-                    startX = pos.x; startY = pos.y; objStartX = p.x; objStartY = p.y;
+                    if (e.detail >= 3) {
+                        window.transformModeObj = p; window.transformModeType = 'hero_phone'; window.transformObjHero = true;
+                        drawHeroPoster();
+                    }
+                    if (window.transformModeObj === p) {
+                        isRotating = false; draggingObj = p; dragType = 'hero_phone';
+                        startX = pos.x; startY = pos.y; objStartX = p.x; objStartY = p.y;
+                    }
                     return;
                 }
+            }
+
+            // Clicked empty space
+            if (window.transformModeObj && window.transformObjHero) {
+                window.transformModeObj = null;
+                window.transformObjHero = false;
+                drawHeroPoster();
             }
         });
         
@@ -1501,9 +1740,11 @@ function setupDragLogic() {
             const lines = heroState.headline.split('\n');
             const headlineH = lines.length * 66;
             const subYStart = heroState.textY + headlineH;
+            const currentSubX = heroState.subX || heroState.textX;
+            const currentSubY = heroState.subY || subYStart;
 
             // Subtext hit test
-            if (pos.x > heroState.textX - 20 && pos.x < heroState.textX + 400 && pos.y > subYStart - 20 && pos.y < subYStart + 150) {
+            if (pos.x > currentSubX - 20 && pos.x < currentSubX + 400 && pos.y > currentSubY - 20 && pos.y < currentSubY + 60) {
                 const newSub = prompt('Edit Subtext:', heroState.sub);
                 if (newSub !== null) {
                     heroState.sub = newSub;
@@ -1528,14 +1769,31 @@ function setupDragLogic() {
     window.addEventListener('mousemove', (e) => {
         if (!draggingObj) return;
         
+        window.isDraggingSlideImg = true;
+        isDragging = true;
+        
         if (dragType === 'text' || dragType === 'frame') {
-            const pos = getMousePos(activeCanvas, e, 0.25);
+            const img = document.getElementById(`row-thumb-${activeSlideIndex}`);
+            if (!img) return;
+            const rect = img.getBoundingClientRect();
+            const scale = rect.width / 1080;
+            const pos = { x: (e.clientX - rect.left) / scale, y: (e.clientY - rect.top) / scale };
+            
             const dx = pos.x - startX;
             const dy = pos.y - startY;
             
-            if (e.shiftKey && dragType === 'frame') {
-                draggingObj.tilt = Math.max(-15, Math.min(15, (draggingObj.tilt || 0) + dx * 0.1));
-                startX = pos.x; 
+            if (isRotating) {
+                let objX = draggingObj.x, objY = draggingObj.y;
+                if (dragType === 'frame') { objX += draggingObj.width/2; objY += draggingObj.height/2; }
+                const angle = Math.atan2(pos.y - objY, pos.x - objX) * 180 / Math.PI;
+                const startAngle = Math.atan2(startY - objY, startX - objX) * 180 / Math.PI;
+                let deltaRot = angle - startAngle;
+                
+                if (dragType === 'frame') {
+                    draggingObj.tilt = objStartRot + deltaRot;
+                } else {
+                    draggingObj.rotation = objStartRot + deltaRot;
+                }
             } else {
                 draggingObj.x = objStartX + dx;
                 draggingObj.y = objStartY + dy;
@@ -1543,19 +1801,45 @@ function setupDragLogic() {
             drawSlide(slides[activeSlideIndex]);
             syncGlobalJson();
         } 
-        else if (dragType === 'hero_text' || dragType === 'hero_phone') {
-            const pos = getMousePos(heroCanvas, e, 0.46875);
+        else if (dragType === 'hero_text' || dragType === 'hero_phone' || dragType === 'hero_sub') {
+            const rect = heroCanvas.parentElement.getBoundingClientRect();
+            const scale = 0.46875;
+            const pos = { x: (e.clientX - rect.left) / scale, y: (e.clientY - rect.top) / scale };
             const dx = pos.x - startX;
             const dy = pos.y - startY;
             
-            if (dragType === 'hero_text') {
-                draggingObj.textX = objStartX + dx;
-                draggingObj.textY = objStartY + dy;
-            } else if (dragType === 'hero_phone') {
-                if (e.shiftKey) {
-                    draggingObj.tilt = Math.max(-45, Math.min(45, (draggingObj.tilt || 0) + dx * 0.1));
-                    startX = pos.x;
-                } else {
+            if (isRotating) {
+                let objX, objY;
+                if (dragType === 'hero_phone') {
+                    const W = 1024, H = 500;
+                    const pivotX = W - 260, pivotY = H + 60;
+                    objX = pivotX + draggingObj.x;
+                    objY = pivotY + draggingObj.y;
+                } else if (dragType === 'hero_text') {
+                    objX = draggingObj.textX; objY = draggingObj.textY;
+                } else if (dragType === 'hero_sub') {
+                    objX = draggingObj.subX || draggingObj.textX; 
+                    objY = draggingObj.subY || (draggingObj.textY + draggingObj.headline.split('\n').length * 66);
+                }
+                const angle = Math.atan2(pos.y - objY, pos.x - objX) * 180 / Math.PI;
+                const startAngle = Math.atan2(startY - objY, startX - objX) * 180 / Math.PI;
+                let deltaRot = angle - startAngle;
+                
+                if (dragType === 'hero_phone') {
+                    draggingObj.tilt = objStartRot + deltaRot;
+                } else if (dragType === 'hero_text') {
+                    draggingObj.headlineRotation = objStartRot + deltaRot;
+                } else if (dragType === 'hero_sub') {
+                    draggingObj.subRotation = objStartRot + deltaRot;
+                }
+            } else {
+                if (dragType === 'hero_text') {
+                    draggingObj.textX = objStartX + dx;
+                    draggingObj.textY = objStartY + dy;
+                } else if (dragType === 'hero_sub') {
+                    draggingObj.subX = objStartX + dx;
+                    draggingObj.subY = objStartY + dy;
+                } else if (dragType === 'hero_phone') {
                     draggingObj.x = objStartX + dx;
                     draggingObj.y = objStartY + dy;
                 }
@@ -1565,7 +1849,12 @@ function setupDragLogic() {
         }
     });
 
-    window.addEventListener('mouseup', () => { draggingObj = null; dragType = null; });
+    window.addEventListener('mouseup', () => { 
+        draggingObj = null; 
+        dragType = null;
+        isRotating = false;
+        setTimeout(() => window.isDraggingSlideImg = false, 50);
+    });
 }
 
 setTimeout(setupDragLogic, 1000);
